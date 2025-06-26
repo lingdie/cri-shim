@@ -4,13 +4,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/labring/cri-shim/pkg/types"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
+
+	"github.com/labring/cri-shim/pkg/types"
 	semconv "go.opentelemetry.io/otel/semconv/v1.9.0"
 )
 

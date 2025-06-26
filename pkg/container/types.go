@@ -6,6 +6,6 @@ type Info struct {
 
 	CommitEnabled bool
 	PushEnabled   bool
-	SquashEnabled bool
-	ImageRef      string
+	// SquashEnabled bool
+	ImageRef string
 }

@@ -2,8 +2,6 @@ package app
 
 import (
 	"context"
-	metrics "github.com/labring/cri-shim/pkg/metric"
-	"go.opentelemetry.io/otel"
 	"log/slog"
 	"net/http"
 	"os"
@@ -11,7 +9,10 @@ import (
 	"syscall"
 	"time"
 
+	"go.opentelemetry.io/otel"
+
 	imageutil "github.com/labring/cri-shim/pkg/image"
+	metrics "github.com/labring/cri-shim/pkg/metric"
 	"github.com/labring/cri-shim/pkg/server"
 	"github.com/labring/cri-shim/pkg/types"
 	"github.com/spf13/cobra"

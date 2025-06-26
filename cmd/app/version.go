@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
+	"github.com/containerd/nerdctl/pkg/clientutil"
 	"github.com/labring/cri-shim/pkg/infoutil"
 	"github.com/labring/cri-shim/pkg/types"
 	"github.com/spf13/cobra"

@@ -2,13 +2,14 @@ package server
 
 import (
 	"context"
-	"go.opentelemetry.io/otel/metric"
 	"log/slog"
 	"net"
 	"os"
 	"runtime"
 	"strings"
 	"time"
+
+	"go.opentelemetry.io/otel/metric"
 
 	"github.com/labring/cri-shim/pkg/container"
 	imageutil "github.com/labring/cri-shim/pkg/image"
@@ -432,19 +433,19 @@ func (s *Server) CommitContainer(task types.Task) error {
 			slog.Info("commit container time", "containerId", statusResp.Status.Id, "time", time.Since(start).Seconds())
 			defer s.imageClient.Remove(ctx, initialImageName, false, false)
 
-			if info.SquashEnabled {
-				if err = s.imageClient.Squash(ctx, initialImageName, imageName); err != nil {
-					slog.Error("failed to squash image", "image name", imageName, "error", err)
-					s.pool.SetCommitStatus(task.ContainerID, types.ErrorCommit)
-					return err
-				}
-			} else {
-				if err = s.imageClient.Tag(ctx, initialImageName, imageName); err != nil {
-					slog.Error("failed to tag image", "image name", imageName, "error", err)
-					s.pool.SetCommitStatus(task.ContainerID, types.ErrorCommit)
-					return err
-				}
+			// if info.SquashEnabled {
+			// 	if err = s.imageClient.Squash(ctx, initialImageName, imageName); err != nil {
+			// 		slog.Error("failed to squash image", "image name", imageName, "error", err)
+			// 		s.pool.SetCommitStatus(task.ContainerID, types.ErrorCommit)
+			// 		return err
+			// 	}
+			// } else {
+			if err = s.imageClient.Tag(ctx, initialImageName, imageName); err != nil {
+				slog.Error("failed to tag image", "image name", imageName, "error", err)
+				s.pool.SetCommitStatus(task.ContainerID, types.ErrorCommit)
+				return err
 			}
+			// }
 		}
 
 		if info.PushEnabled {
@@ -530,8 +531,8 @@ func (s *Server) GetContainerInfo(ctx context.Context, containerID string) (regi
 			registry.Repository = kv[1]
 		case types.SealosUsernameOnEnv:
 			registry.SealosUsername = kv[1]
-		case types.ImageSquashOnEnv:
-			info.SquashEnabled = kv[1] == types.ImageSquashOnEnvEnableValue
+		// case types.ImageSquashOnEnv:
+		// 	info.SquashEnabled = kv[1] == types.ImageSquashOnEnvEnableValue
 		case types.ImageNameOnEnv:
 			info.CommitImage = kv[1]
 		case types.ContainerCommitOnStopEnvFlag:

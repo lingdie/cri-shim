@@ -2,25 +2,20 @@ package image
 
 import (
 	"context"
-	"fmt"
 
 	"io"
 	"log/slog"
 	"os"
-	"time"
 
 	"github.com/containerd/containerd"
-	"github.com/containerd/containerd/leases"
 	"github.com/containerd/containerd/remotes"
 	"github.com/containerd/containerd/remotes/docker"
 	"github.com/containerd/containerd/remotes/docker/config"
-	"github.com/containerd/nerdctl/v2/pkg/api/types"
-	"github.com/containerd/nerdctl/v2/pkg/clientutil"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/container"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/image"
-	"github.com/containerd/nerdctl/v2/pkg/cmd/login"
-	"github.com/labring/layer-squash/pkg/options"
-	"github.com/labring/layer-squash/pkg/runtime"
+	"github.com/containerd/nerdctl/pkg/api/types"
+	"github.com/containerd/nerdctl/pkg/clientutil"
+	"github.com/containerd/nerdctl/pkg/cmd/container"
+	"github.com/containerd/nerdctl/pkg/cmd/image"
+	"github.com/containerd/nerdctl/pkg/cmd/login"
 )
 
 // ImageInterface defines the interface for image operations
@@ -29,7 +24,7 @@ type ImageInterface interface {
 	Pull(context.Context, string, string, string) error
 	Commit(ctx context.Context, imageName, containerID string, pause bool) error
 	Login(ctx context.Context, serverAddress, username, password string) error
-	Squash(ctx context.Context, SourceImageRef, TargetImageName string) error
+	// Squash(ctx context.Context, SourceImageRef, TargetImageName string) error
 	Remove(ctx context.Context, args string, force, async bool) error
 	Tag(ctx context.Context, src, dest string) error
 	Stop()
@@ -41,8 +36,8 @@ type imageInterfaceImpl struct {
 	FStdout       *os.File
 	Cancel        context.CancelFunc
 
-	Client       *containerd.Client
-	SquashClient *runtime.Runtime
+	Client *containerd.Client
+	// SquashClient *runtime.Runtime
 }
 
 // NewImageInterface returns a new implementation of ImageInterface
@@ -64,9 +59,9 @@ func NewImageInterface(namespace, address string, fStdout *os.File) (ImageInterf
 		return nil, err
 	}
 
-	if impl.SquashClient, err = runtime.NewRuntime(impl.Client, global.Namespace); err != nil {
-		return nil, err
-	}
+	// if impl.SquashClient, err = runtime.NewRuntime(impl.Client, global.Namespace); err != nil {
+	// 	return nil, err
+	// }
 
 	return impl, nil
 }
@@ -191,20 +186,20 @@ func (impl *imageInterfaceImpl) Login(ctx context.Context, serverAddress, userna
 	return login.Login(ctx, opt, impl.Stdout)
 }
 
-func (impl *imageInterfaceImpl) Squash(ctx context.Context, SourceImageRef, TargetImageName string) error {
-	slog.Info("Squashing image", "SourceImageRef", SourceImageRef, "TargetImageName", TargetImageName)
-	opt := options.Option{
-		SourceImageRef:   SourceImageRef,
-		TargetImageName:  TargetImageName,
-		SquashLayerCount: 2,
-	}
-	ctx, done, err := impl.Client.WithLease(ctx, leases.WithRandomID(), leases.WithExpiration(1*time.Hour))
-	if err != nil {
-		return fmt.Errorf("failed to create lease for squash: %w", err)
-	}
-	defer done(ctx)
-	return impl.SquashClient.Squash(ctx, opt)
-}
+// func (impl *imageInterfaceImpl) Squash(ctx context.Context, SourceImageRef, TargetImageName string) error {
+// 	slog.Info("Squashing image", "SourceImageRef", SourceImageRef, "TargetImageName", TargetImageName)
+// 	opt := options.Option{
+// 		SourceImageRef:   SourceImageRef,
+// 		TargetImageName:  TargetImageName,
+// 		SquashLayerCount: 2,
+// 	}
+// 	ctx, done, err := impl.Client.WithLease(ctx, leases.WithRandomID(), leases.WithExpiration(1*time.Hour))
+// 	if err != nil {
+// 		return fmt.Errorf("failed to create lease for squash: %w", err)
+// 	}
+// 	defer done(ctx)
+// 	return impl.SquashClient.Squash(ctx, opt)
+// }
 
 func (impl *imageInterfaceImpl) Pull(ctx context.Context, args, username, password string) error {
 

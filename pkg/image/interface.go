@@ -84,9 +84,10 @@ func (impl *imageInterfaceImpl) Stop() {
 func (impl *imageInterfaceImpl) Commit(ctx context.Context, imageName, containerID string, pause bool) error {
 	slog.Info("Committing container", "ContainerID", containerID, "ImageName", imageName)
 	opt := types.ContainerCommitOptions{
-		Stdout:   io.Discard,
-		GOptions: impl.GlobalOptions,
-		Pause:    pause,
+		Stdout:      io.Discard,
+		GOptions:    impl.GlobalOptions,
+		Pause:       pause,
+		Compression: types.Zstd,
 	}
 	return container.Commit(ctx, impl.Client, imageName, containerID, opt)
 }
